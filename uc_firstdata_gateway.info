@@ -1,0 +1,8 @@
+name = First Data Gateway
+description = A gateway used to process Ubercart payments using the First Data Web Service.
+dependencies[] = uc_payment
+dependencies[] = uc_credit
+package = Ubercart - payment
+core = 6.x
+php = 5.0
+
