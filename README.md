@@ -1,6 +1,6 @@
 UC First Data Gateway
 =====================
-Enables a payment gateway in Ubercart that allows users to pay via the
+Enables a payment gateway in [Ubercart](http://www.ubercart.org/) that allows users to pay via the
 [First Data Web Service](http://www.firstdata.com).
 
 Features
