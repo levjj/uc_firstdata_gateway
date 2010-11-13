@@ -158,10 +158,10 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
   $xml .= "  <v1:Address2>" . $order->billing_street2 . "</v1:Address2>";
   $xml .= "  <v1:City>" . $order->billing_city . "</v1:City>";
   $xml .= "  <v1:State>" . uc_get_zone_code($order->billing_zone) . "</v1:State>";
-  $xml .= "  <v1:ZipCode>" . $order->billing_postal_code . "</v1:ZipCode>";
+  $xml .= "  <v1:Zip>" . $order->billing_postal_code . "</v1:Zip>";
   $xml .= "  <v1:Country>" . $submit_data['x_country'][0]['country_iso_code_2'] . "</v1:Country>";
   $xml .= "  <v1:Phone>" . $order->billing_phone ."</v1:Phone>";
-  $xml .= "  <v1:Email>" . $order->primary_email . "</v1:Email>";
+//  $xml .= "  <v1:Email>" . $order->primary_email . "</v1:Email>";
   $xml .= "</v1:Billing>";
 
   $xml .= "<v1:Shipping>";
@@ -174,10 +174,10 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
   $xml .= "  <v1:Country>" . $submit_data['x_ship_to_country'][0]['country_iso_code_2'] . "</v1:Country>";
   $xml .= "</v1:Shipping>";
 
-  $xml .= '<v1:TransactionDetails>';
-  if (!empty($user->uid)) $xml .= "<v1:UserID>" . $user->uid . "</v1:UserID>";
-  $xml .= "  <v1:OrderID>" . $order_id . "</v1:OrderID>";
-  $xml .= "</v1:TransactionDetails>";
+//  $xml .= '<v1:TransactionDetails>';
+//  if (!empty($user->uid)) $xml .= "<v1:UserID>" . $user->uid . "</v1:UserID>";
+//  $xml .= "  <v1:OrderID>" . $order_id . "</v1:OrderID>";
+//  $xml .= "</v1:TransactionDetails>";
 
   $xml .= "</v1:Transaction>";
   $xml .= '</fdggwsapi:FDGGWSApiOrderRequest>';
