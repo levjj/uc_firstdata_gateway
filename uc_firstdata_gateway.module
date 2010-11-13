@@ -115,6 +115,7 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
  * Convert some data before sending it to Linkpoint
  ******************************************************************************/
   $cardexpyr = substr($order->payment_details['cc_exp_year'], 2, 2);
+  $cardexpmo = sprintf("%02d", $order->payment_details['cc_exp_month']);
 
   $submit_data = array(
     'x_country' => uc_get_country_data(array('country_id' => $order->billing_country)),
@@ -137,17 +138,17 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
 
   $xml .= '<v1:CreditCardData>';
   $xml .= "  <v1:CardNumber>" . $order->payment_details['cc_number'] . "</v1:CardNumber>";
-  $xml .= "  <v1:ExpMonth>" . $order->payment_details['cc_exp_month'] . "</v1:ExpMonth>";
+  $xml .= "  <v1:ExpMonth>" . $cardexpmo . "</v1:ExpMonth>";
   $xml .= "  <v1:ExpYear>" . $cardexpyr . "</v1:ExpYear> ";
   $xml .= "  <v1:CardCodeValue>" . $order->payment_details['cc_cvv'] . "</v1:CardCodeValue>";
   $xml .= "  <v1:CardCodeIndicator>" . $cvmindicator . "</v1:CardCodeIndicator>";
   $xml .= "</v1:CreditCardData>";
 
   $xml .= "<v1:Payment>";
-  if (!empty($subtotal)) $xml .= "<v1:SubTotal>" . $subtotal . "</v1:SubTotal>";
-  if (!empty($tax)) $xml .= "<v1:VATTax>" . $tax . "</v1:VATTax>";
-  if (!empty($shipping)) $xml .= "<v1:Shipping>" . $shipping . "</v1:Shipping>";
-  $xml .= "<v1:ChargeTotal>" . $amount . "</v1:ChargeTotal>";
+  if (!empty($subtotal)) $xml .= "<v1:SubTotal>" . money_format('%.2n', $subtotal) . "</v1:SubTotal>";
+  if (!empty($tax)) $xml .= "<v1:VATTax>" . money_format('%.2n', $tax) . "</v1:VATTax>";
+  if (!empty($shipping)) $xml .= "<v1:Shipping>" . money_format('%.2n', $shipping) . "</v1:Shipping>";
+  $xml .= "<v1:ChargeTotal>" . money_format('%.2n', $amount) . "</v1:ChargeTotal>";
   $xml .= "</v1:Payment>";
 
   $xml .= "<v1:Billing>";
