@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_uninstall().
  */
-function uc_linkpoint_api_uninstall() {
+function uc_firstdata_gateway_uninstall() {
   variable_del('firstdata_gateway_login_id');
   variable_del('firstdata_gateway_login_pw');
   variable_del('firstdata_gateway_transaction_cert');
