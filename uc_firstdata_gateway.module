@@ -7,7 +7,15 @@
  * Based on UC Linkpoint API (http://drupal.org/project/uc_linkpoint_api).
  */
 
-/*******************************************************************************
+/***************************  $retarr = array();
+  $retarr['approved'] = 'DECLINED';
+  foreach ($dom->getElementsByTagName("TransactionResult") as $nn) {
+     $retarr['approved'] = $nn->firstChild->nodeValue;
+  } 
+  $retarr['error'] = '';
+  foreach ($dom->getElementsByTagName("ErrorMessage") as $nn) {
+     $retarr['error'] = $nn->firstChild->nodeValue;
+  }****************************************************
  * Hook Functions (Ubercart)
  ******************************************************************************/
 
@@ -239,23 +247,18 @@ function _uc_firstdata_gateway_execute_txn($xml) {
   }
 
   $dom = new DOMDocument();
-  $dom->load($buffer);
+  $dom->loadXML($buffer);
 
   $retarr = array();
-
   $retarr['approved'] = 'DECLINED';
-  foreach ($dom->getElementsByTagName("fdggwsapi:TransactionResult") as $nn) {
-    foreach ($dom->childNodes as $cn) {
-      if ($cn->nodeName == '#text') $retarr['approved'] = $cn->nodeValue;
-    }
+  foreach ($dom->getElementsByTagName("TransactionResult") as $nn) {
+     $retarr['approved'] = $nn->firstChild->nodeValue;
   } 
   $retarr['error'] = '';
-  foreach ($dom->getElementsByTagName("fdggwsapi:ErrorMessage") as $nn) {
-    foreach ($dom->childNodes as $cn) {
-      if ($cn->nodeName == '#text') $retarr['error'] = $cn->nodeValue;
-    }
+  foreach ($dom->getElementsByTagName("ErrorMessage") as $nn) {
+     $retarr['error'] = $nn->firstChild->nodeValue;
   }
-
+  
   watchdog('uc_firstdata_gateway', 'Got the following answer: !res', array('!res' => print_r($buffer, true)), WATCHDOG_WARNING);
   return $retarr;
 }
