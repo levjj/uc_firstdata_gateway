@@ -116,6 +116,19 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
  ******************************************************************************/
   $cardexpyr = substr($order->payment_details['cc_exp_year'], 2, 2);
   $cardexpmo = sprintf("%02d", $order->payment_details['cc_exp_month']);
+  $shipping = 0;
+  foreach ($order->line_items as $item) {
+    if ($item['type'] == 'shipping') {
+      $shipping += $item['amount'];
+    }
+  }
+
+  $tax = 0;
+  if (module_exists('uc_taxes')) {
+    foreach (uc_taxes_calculate($order) as $tax_item) {
+      $tax += $tax_item->amount;
+    }
+  }
 
   $submit_data = array(
     'x_country' => uc_get_country_data(array('country_id' => $order->billing_country)),
@@ -260,7 +273,6 @@ function _uc_firstdata_gateway_execute_txn($xml) {
      $retarr['error'] = $nn->firstChild->nodeValue;
   }
   
-  watchdog('uc_firstdata_gateway', 'Got the following answer: !res', array('!res' => print_r($buffer, true)), WATCHDOG_WARNING);
   return $retarr;
 }
 
