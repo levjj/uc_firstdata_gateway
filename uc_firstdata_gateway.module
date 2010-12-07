@@ -7,17 +7,7 @@
  * Based on UC Linkpoint API (http://drupal.org/project/uc_linkpoint_api).
  */
 
-/***************************  $retarr = array();
-  $retarr['approved'] = 'DECLINED';
-  foreach ($dom->getElementsByTagName("TransactionResult") as $nn) {
-     $retarr['approved'] = $nn->firstChild->nodeValue;
-  } 
-  $retarr['error'] = '';
-  foreach ($dom->getElementsByTagName("ErrorMessage") as $nn) {
-     $retarr['error'] = $nn->firstChild->nodeValue;
-  }****************************************************
- * Hook Functions (Ubercart)
- ******************************************************************************/
+// Hook Functions (Ubercart)
 
 function uc_firstdata_gateway_payment_gateway() {
   $gateways[] = array(
@@ -31,9 +21,7 @@ function uc_firstdata_gateway_payment_gateway() {
   return $gateways;
 }
 
-/*******************************************************************************
- * Callback Functions, Forms, and Tables
- ******************************************************************************/
+// Callback Functions, Forms, and Tables
 
 /**
  * Callback for payment gateway settings.
@@ -111,9 +99,7 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
   $description = substr($description, 0, 255);
 
 
-/*******************************************************************************
- * Convert some data before sending it to Linkpoint
- ******************************************************************************/
+  // convert some data before sending it to Linkpoint
   $cardexpyr = substr($order->payment_details['cc_exp_year'], 2, 2);
   $cardexpmo = sprintf("%02d", $order->payment_details['cc_exp_month']);
   $shipping = 0;
@@ -135,9 +121,7 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
     'x_ship_to_country' => uc_get_country_data(array('country_id' => $order->delivery_country)),
   );
 
-/*******************************************************************************
- * Build XML string
- ******************************************************************************/
+  // build XML string
 
   $xml  = '<fdggwsapi:FDGGWSApiOrderRequest';
   $xml .= ' xmlns:v1="http://secure.linkpt.net/fdggwsapi/schemas_us/v1"';
