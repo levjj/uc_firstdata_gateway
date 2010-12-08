@@ -6,3 +6,6 @@ package = Ubercart - payment
 core = 6.x
 php = 5.0
 
+files[] = uc_firstdata_gateway.install
+files[] = uc_firstdata_gateway.module
+
