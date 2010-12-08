@@ -98,7 +98,6 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
   }
   $description = drupal_substr($description, 0, 255);
 
-
   // convert some data before sending it to Linkpoint
   $cardexpyr = drupal_substr($order->payment_details['cc_exp_year'], 2, 2);
   $cardexpmo = sprintf("%02d", $order->payment_details['cc_exp_month']);
@@ -193,7 +192,7 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
 
   if ($retarr['approved'] != 'APPROVED') {
     $message = t('Credit card declined for !amount with error: !error',
-                 array('!amount' => uc_currency_format($amount), '!error' => $retarr['error']));
+      array('!amount' => uc_currency_format($amount), '!error' => $retarr['error']));
     $result = array(
       'success' => FALSE,
       'comment' => $message,
@@ -203,7 +202,7 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
   }
   else {
     $message = t('Credit card processed successfully for !amount.',
-                 array('!amount' => uc_currency_format($amount)));
+      array('!amount' => uc_currency_format($amount)));
     $result = array(
       'success' => TRUE,
       'comment' => $message,
@@ -279,3 +278,4 @@ function _uc_firstdata_gateway_soap_xml($xml) {
   $post = '</SOAP-ENV:Body></SOAP-ENV:Envelope>';
   return $pre . $xml . $post;
 }
+
