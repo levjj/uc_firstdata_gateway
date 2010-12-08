@@ -248,21 +248,21 @@ function _uc_firstdata_gateway_execute_txn($xml) {
   }
   curl_close($ch);
 
-  if (drupal_strlen($buffer) < 2) {
-    $buffer = "<r_error>Sorry - Could not connect to payment gateway.</r_error>";
-  }
-
-  $dom = new DOMDocument();
-  $dom->loadXML($buffer);
-
   $retarr = array();
   $retarr['approved'] = 'DECLINED';
-  foreach ($dom->getElementsByTagName("TransactionResult") as $nn) {
-    $retarr['approved'] = $nn->firstChild->nodeValue;
-  } 
   $retarr['error'] = '';
-  foreach ($dom->getElementsByTagName("ErrorMessage") as $nn) {
-    $retarr['error'] = $nn->firstChild->nodeValue;
+  
+  if (drupal_strlen($buffer) < 2) {
+    $retarr['error'] = 'Sorry - Could not connect to payment gateway.';
+  } else {
+    $dom = new DOMDocument();
+    $dom->loadXML($buffer);
+    foreach ($dom->getElementsByTagName("TransactionResult") as $nn) {
+      $retarr['approved'] = $nn->firstChild->nodeValue;
+    }
+    foreach ($dom->getElementsByTagName("ErrorMessage") as $nn) {
+      $retarr['error'] = $nn->firstChild->nodeValue;
+    }
   }
   
   return $retarr;
