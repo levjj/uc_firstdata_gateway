@@ -2,14 +2,12 @@
 // $Id$
 /**
  * @file
- * A module used for First Data payment gateway
- *
- * Developed by Christopher Schuster (http://livoris.de/ | cs@livoris.de).
- * Based on UC Linkpoint API (http://drupal.org/project/uc_linkpoint_api).
+ * An Ubercart payment gateway module for First Data.
  */
 
-// Hook Functions (Ubercart)
-
+/**
+ * Implements hook_payment_gateway().
+ */
 function uc_firstdata_gateway_payment_gateway() {
   $gateways[] = array(
     'id' => 'firstdata',
@@ -22,10 +20,8 @@ function uc_firstdata_gateway_payment_gateway() {
   return $gateways;
 }
 
-// Callback Functions, Forms, and Tables
-
 /**
- * Callback for payment gateway settings.
+ * Callback function for payment gateway settings.
  */
 function uc_firstdata_gateway_settings_form() {
   $form['firstdata_gateway_settings'] = array(
@@ -65,6 +61,9 @@ function uc_firstdata_gateway_settings_form() {
   return $form;
 }
 
+/**
+ * Callback function for the credit payment method.
+ */
 function uc_firstdata_gateway_charge($order_id, $amount, $data) {
   global $user;
   if (!function_exists('curl_init')) {
@@ -80,7 +79,7 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
   // If users attempts to submit order more than once then modify Order ID so
   // as to avoid a duplicate transaction error.
   $_SESSION['uc_firstdata_attempt'] = empty($_SESSION['uc_firstdata_attempt']) ? 1 : ($_SESSION['uc_firstdata_attempt'] + 1);
-  $oid = $_SESSION['uc_firstdata_attempt'] > 1 ? ($order_id.'-'.$_SESSION['uc_firstdata_attempt']) : $order_id;
+  $oid = $_SESSION['uc_firstdata_attempt'] > 1 ? ($order_id . '-' . $_SESSION['uc_firstdata_attempt']) : $order_id;
   $order = uc_order_load($order_id);
   $shipping = $tax = $subtotal = 0;
   $description = '';
@@ -89,19 +88,19 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
       if (!empty($description)) {
         $description .= ' // ';
       }
-      $description .= $product->title .' x'. $product->qty;
+      $description .= $product->title . ' x' . $product->qty;
       if ($product->data['attributes']) {
         foreach ($product->data['attributes'] as $key => $value) {
-          $description .= ', '. $key .': '. $value;
+          $description .= ', ' . $key . ': ' . $value;
         }
       }
     }
   }
-  $description = substr($description, 0, 255);
+  $description = drupal_substr($description, 0, 255);
 
 
   // convert some data before sending it to Linkpoint
-  $cardexpyr = substr($order->payment_details['cc_exp_year'], 2, 2);
+  $cardexpyr = drupal_substr($order->payment_details['cc_exp_year'], 2, 2);
   $cardexpmo = sprintf("%02d", $order->payment_details['cc_exp_month']);
   $shipping = 0;
   foreach ($order->line_items as $item) {
@@ -143,14 +142,22 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
   $xml .= "</v1:CreditCardData>";
 
   $xml .= "<v1:Payment>";
-  if (!empty($subtotal)) $xml .= "<v1:SubTotal>" . money_format('%.2n', $subtotal) . "</v1:SubTotal>";
-  if (!empty($tax)) $xml .= "<v1:VATTax>" . money_format('%.2n', $tax) . "</v1:VATTax>";
-  if (!empty($shipping)) $xml .= "<v1:Shipping>" . money_format('%.2n', $shipping) . "</v1:Shipping>";
+  if (!empty($subtotal)) {
+    $xml .= "<v1:SubTotal>" . money_format('%.2n', $subtotal) . "</v1:SubTotal>";
+  }
+  if (!empty($tax)) {
+    $xml .= "<v1:VATTax>" . money_format('%.2n', $tax) . "</v1:VATTax>";
+  }
+  if (!empty($shipping)) {
+    $xml .= "<v1:Shipping>" . money_format('%.2n', $shipping) . "</v1:Shipping>";
+  }
   $xml .= "<v1:ChargeTotal>" . money_format('%.2n', $amount) . "</v1:ChargeTotal>";
   $xml .= "</v1:Payment>";
 
   $xml .= "<v1:Billing>";
-  if (!empty($user->uid)) $xml .= "<v1:CustomerID>" . $user->uid . "</v1:CustomerID>";
+  if (!empty($user->uid)) {
+    $xml .= "<v1:CustomerID>" . $user->uid . "</v1:CustomerID>";
+  }
   $xml .= "  <v1:Name>" . $order->billing_first_name. " " . $order->billing_last_name . "</v1:Name>";
   $xml .= "  <v1:Company>" . $order->billing_company . "</v1:Company>";
   $xml .= "  <v1:Address1>" . $order->billing_street1 . "</v1:Address1>";
@@ -159,8 +166,7 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
   $xml .= "  <v1:State>" . uc_get_zone_code($order->billing_zone) . "</v1:State>";
   $xml .= "  <v1:Zip>" . $order->billing_postal_code . "</v1:Zip>";
   $xml .= "  <v1:Country>" . $submit_data['x_country'][0]['country_iso_code_2'] . "</v1:Country>";
-  $xml .= "  <v1:Phone>" . $order->billing_phone ."</v1:Phone>";
-//  $xml .= "  <v1:Email>" . $order->primary_email . "</v1:Email>";
+  $xml .= "  <v1:Phone>" . $order->billing_phone . "</v1:Phone>";
   $xml .= "</v1:Billing>";
 
   $xml .= "<v1:Shipping>";
@@ -173,10 +179,12 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
   $xml .= "  <v1:Country>" . $submit_data['x_ship_to_country'][0]['country_iso_code_2'] . "</v1:Country>";
   $xml .= "</v1:Shipping>";
 
-//  $xml .= '<v1:TransactionDetails>';
-//  if (!empty($user->uid)) $xml .= "<v1:UserID>" . $user->uid . "</v1:UserID>";
-//  $xml .= "  <v1:OrderID>" . $order_id . "</v1:OrderID>";
-//  $xml .= "</v1:TransactionDetails>";
+  $xml .= '<v1:TransactionDetails>';
+  if (!empty($user->uid)) {
+    $xml .= "<v1:UserID>" . $user->uid . "</v1:UserID>";
+  }
+  $xml .= "  <v1:OrderID>" . $order_id . "</v1:OrderID>";
+  $xml .= "</v1:TransactionDetails>";
 
   $xml .= "</v1:Transaction>";
   $xml .= '</fdggwsapi:FDGGWSApiOrderRequest>';
@@ -219,9 +227,9 @@ function _uc_firstdata_gateway_execute_txn($xml) {
   curl_setopt($ch, CURLOPT_POST, 1);
   curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: text/xml"));
   curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-  $username = "WS".variable_get('firstdata_gateway_login_id', '')."._.1";
+  $username = "WS" . variable_get('firstdata_gateway_login_id', '') . "._.1";
   $password = variable_get('firstdata_gateway_login_pw', '');
-  curl_setopt($ch, CURLOPT_USERPWD, $username.':'.$password);
+  curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
   curl_setopt($ch, CURLOPT_POSTFIELDS, _uc_firstdata_gateway_soap_xml($xml));
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
   curl_setopt($ch, CURLOPT_SSLKEY, variable_get('firstdata_gateway_transaction_key', ''));
@@ -241,7 +249,7 @@ function _uc_firstdata_gateway_execute_txn($xml) {
   }
   curl_close($ch);
 
-  if (strlen($buffer) < 2) {
+  if (drupal_strlen($buffer) < 2) {
     $buffer = "<r_error>Sorry - Could not connect to payment gateway.</r_error>";
   }
 
@@ -251,11 +259,11 @@ function _uc_firstdata_gateway_execute_txn($xml) {
   $retarr = array();
   $retarr['approved'] = 'DECLINED';
   foreach ($dom->getElementsByTagName("TransactionResult") as $nn) {
-     $retarr['approved'] = $nn->firstChild->nodeValue;
+    $retarr['approved'] = $nn->firstChild->nodeValue;
   } 
   $retarr['error'] = '';
   foreach ($dom->getElementsByTagName("ErrorMessage") as $nn) {
-     $retarr['error'] = $nn->firstChild->nodeValue;
+    $retarr['error'] = $nn->firstChild->nodeValue;
   }
   
   return $retarr;
