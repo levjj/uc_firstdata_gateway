@@ -9,10 +9,11 @@
  * Implements hook_uninstall().
  */
 function uc_firstdata_gateway_uninstall() {
-  variable_del('firstdata_gateway_login_id');
-  variable_del('firstdata_gateway_login_pw');
-  variable_del('firstdata_gateway_transaction_cert');
-  variable_del('firstdata_gateway_transaction_key');
-  variable_del('firstdata_gateway_transaction_pw');
+  variable_del('uc_firstdata_gateway_login_id');
+  variable_del('uc_firstdata_gateway_login_pw');
+  variable_del('uc_firstdata_gateway_transaction_cert');
+  variable_del('uc_firstdata_gateway_transaction_key');
+  variable_del('uc_firstdata_gateway_transaction_pw');
+  variable_del('uc_firstdata_gateway_mode');
 }
 

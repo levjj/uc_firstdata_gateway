@@ -5,6 +5,9 @@
  * An Ubercart payment gateway module for First Data.
  */
 
+define('UC_FIRSTDATA_GATEWAY_TEST_URL', 'https://ws.merchanttest.firstdataglobalgateway.com/fdggwsapi/services/order.wsdl');
+define('UC_FIRSTDATA_GATEWAY_PRODUCTION_URL', 'https://ws.firstdataglobalgateway.com/fdggwsapi/services/order.wsdl');
+
 /**
  * Implements hook_payment_gateway().
  */
@@ -28,36 +31,47 @@ function uc_firstdata_gateway_settings_form() {
     '#type' => 'fieldset',
     '#title' => t('First Data Gateway settings'),
   );
-  $form['firstdata_gateway_settings']['firstdata_gateway_login_id'] = array(
+  $form['firstdata_gateway_settings']['uc_firstdata_gateway_login_id'] = array(
     '#type' => 'textfield',
     '#title' => t('Store Number'),
-    '#default_value' => variable_get('firstdata_gateway_login_id', ''),
+    '#default_value' => variable_get('uc_firstdata_gateway_login_id', ''),
     '#description' => t("Enter your 10 digit Store Number assigned to you by Linkpoint."),
   );
-  $form['firstdata_gateway_settings']['firstdata_gateway_login_pw'] = array(
+  $form['firstdata_gateway_settings']['uc_firstdata_gateway_login_pw'] = array(
     '#type' => 'password',
     '#title' => t('Account Password'),
-    '#default_value' => variable_get('firstdata_gateway_login_pw', ''),
+    '#default_value' => variable_get('uc_firstdata_gateway_login_pw', ''),
     '#description' => t('Enter the First Data WebService API password. You must have this for First Data Gateway to work. Get this by opening a file named "WS&lt;store_ID&gt;._.1.auth.txt" (replace "&lt;store_ID&gt;" with your store ID or user ID).'),
   );
-  $form['firstdata_gateway_settings']['firstdata_gateway_transaction_key'] = array(
+  $form['firstdata_gateway_settings']['uc_firstdata_gateway_transaction_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Private Key File'),
-    '#default_value' => variable_get('firstdata_gateway_transaction_key', ''),
+    '#default_value' => variable_get('uc_firstdata_gateway_transaction_key', ''),
     '#description' => t('Enter the absolute path of your private key file (from your server root). You must have this for First Data Gateway to work. Get this by logging in to <a target="_blank" href="http://www.linkpointcentral.com">Linkpoint Central</a> > Support > Download Center. File should be named "WS&lt;store_ID&gt;._.1.key" (replace "&lt;store_ID&gt;" with your store ID or user ID).'),
   );
-  $form['firstdata_gateway_settings']['firstdata_gateway_transaction_cert'] = array(
+  $form['firstdata_gateway_settings']['uc_firstdata_gateway_transaction_cert'] = array(
     '#type' => 'textfield',
     '#title' => t('PEM File'),
-    '#default_value' => variable_get('firstdata_gateway_transaction_cert', ''),
+    '#default_value' => variable_get('uc_firstdata_gateway_transaction_cert', ''),
     '#description' => t('Enter the absolute path of your PEM file (from your server root). You must have this for First Data Gateway to work. Get this by logging in to <a target="_blank" href="http://www.linkpointcentral.com">Linkpoint Central</a> > Support > Download Center. File should be named "WS&lt;store_ID&gt;._.1.pem" (replace "&lt;store_ID&gt;" with your store ID or user ID).'),
   );
-  $form['firstdata_gateway_settings']['firstdata_gateway_transaction_pw'] = array(
+  $form['firstdata_gateway_settings']['uc_firstdata_gateway_transaction_pw'] = array(
     '#type' => 'password',
     '#title' => t('Password for private key file'),
     '#default_value' => variable_get('firstdata_gateway_transaction_pw', ''),
     '#description' => t('Enter the password of your private key file. You must have this for First Data Gateway to work. Get this by opening a file named "WS&lt;store_ID&gt;._.1.key.pw.txt" (replace "&lt;store_ID&gt;" with your store ID or user ID).'),
   );
+  $form['firstdata_gateway_settings']['uc_firstdata_gateway_mode'] = array(
+    '#type' => 'radios',
+    '#title' => t('Transaction mode'),
+    '#description' => t('You need to apply for a Customer Integration Envirioment Test Account at http://www.firstdata.com/gg/apply_test_account.htm in order to use test mode. No charges apply in test mode.'),
+    '#options' => array(
+      'test' => t('Testing (Customer Integration Environment)'),
+      'production' => t('Production'),
+    ),
+    '#default_value' => variable_get('uc_firstdata_gateway_mode', 'test'),
+  );
+  
   return $form;
 }
 
@@ -220,7 +234,11 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
  * @return array An array based on the XML that linkpoint returns
  */
 function _uc_firstdata_gateway_execute_txn($xml) {
-  $ch = curl_init('https://ws.firstdataglobalgateway.com/fdggwsapi/services/order.wsdl');
+  if (variable_get('uc_firstdata_gateway_mode', 'test') == 'test') {
+    $ch = curl_init(UC_FIRSTDATA_GATEWAY_TEST_URL);
+  } else {
+    $ch = curl_init(UC_FIRSTDATA_GATEWAY_PRODUCTION_URL);
+  }
   curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
   curl_setopt($ch, CURLOPT_VERBOSE, 1);
   curl_setopt($ch, CURLOPT_POST, 1);
