@@ -112,7 +112,7 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
   }
   $description = drupal_substr($description, 0, 255);
 
-  // convert some data before sending it to Linkpoint
+  // convert some data before sending it to First Data
   $cardexpyr = drupal_substr($order->payment_details['cc_exp_year'], 2, 2);
   $cardexpmo = sprintf("%02d", $order->payment_details['cc_exp_month']);
   $shipping = 0;
@@ -244,19 +244,19 @@ function _uc_firstdata_gateway_execute_txn($xml) {
   curl_setopt($ch, CURLOPT_POST, 1);
   curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: text/xml"));
   curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-  $username = "WS" . variable_get('firstdata_gateway_login_id', '') . "._.1";
-  $password = variable_get('firstdata_gateway_login_pw', '');
+  $username = "WS" . variable_get('uc_firstdata_gateway_login_id', '') . "._.1";
+  $password = variable_get('uc_firstdata_gateway_login_pw', '');
   curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
   curl_setopt($ch, CURLOPT_POSTFIELDS, _uc_firstdata_gateway_soap_xml($xml));
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($ch, CURLOPT_SSLKEY, variable_get('firstdata_gateway_transaction_key', ''));
-  curl_setopt($ch, CURLOPT_SSLCERT, variable_get('firstdata_gateway_transaction_cert', ''));
-  curl_setopt($ch, CURLOPT_SSLKEYPASSWD, variable_get('firstdata_gateway_transaction_pw', ''));
+  curl_setopt($ch, CURLOPT_SSLKEY, variable_get('uc_firstdata_gateway_transaction_key', ''));
+  curl_setopt($ch, CURLOPT_SSLCERT, variable_get('uc_firstdata_gateway_transaction_cert', ''));
+  curl_setopt($ch, CURLOPT_SSLKEYPASSWD, variable_get('uc_firstdata_gateway_transaction_pw', ''));
   $buffer = curl_exec($ch);
 
   if ($error = curl_error($ch)) {
     $error .= '<br />The file: %file ';
-    if (file_exists(variable_get('firstdata_gateway_transaction_key', ''))) {
+    if (file_exists(variable_get('uc_firstdata_gateway_transaction_key', ''))) {
       $error .= 'exists: check your pass phrase or verify that you have downloaded the right key file and certificate.';
     }
     else {
