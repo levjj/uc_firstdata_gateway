@@ -65,9 +65,9 @@ function uc_firstdata_gateway_settings_form() {
     '#type' => 'radios',
     '#title' => t('Transaction mode'),
     '#default_value' => variable_get('uc_firstdata_gateway_mode', 'test'),
-    '#description' => t('You need to apply for a Customer Integration Envirioment Test Account at http://www.firstdata.com/gg/apply_test_account.htm in order to use test mode. No charges apply in test mode.'),
+    '#description' => t('You need to apply for a Customer Test Envirioment Test Account at http://www.firstdata.com/gg/apply_test_account.htm in order to use test mode. No charges apply in test mode.'),
     '#options' => array(
-      'test' => t('Testing (Customer Integration Environment)'),
+      'test' => t('Testing (Customer Test Environment)'),
       'production' => t('Production'),
     ),
   );
