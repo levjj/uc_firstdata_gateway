@@ -155,6 +155,7 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
   $xml .= "</v1:CreditCardData>";
 
   $xml .= "<v1:Payment>";
+  $xml .= "<v1:ChargeTotal>" . money_format('%.2n', $amount) . "</v1:ChargeTotal>";
   if (!empty($subtotal)) {
     $xml .= "<v1:SubTotal>" . money_format('%.2n', $subtotal) . "</v1:SubTotal>";
   }
@@ -164,7 +165,6 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
   if (!empty($shipping)) {
     $xml .= "<v1:Shipping>" . money_format('%.2n', $shipping) . "</v1:Shipping>";
   }
-  $xml .= "<v1:ChargeTotal>" . money_format('%.2n', $amount) . "</v1:ChargeTotal>";
   $xml .= "</v1:Payment>";
 
   $xml .= "<v1:Billing>";
