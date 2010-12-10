@@ -160,7 +160,7 @@ function uc_firstdata_gateway_charge($order_id, $amount, $data) {
     $xml .= "<v1:SubTotal>" . money_format('%.2n', $subtotal) . "</v1:SubTotal>";
   }
   if (!empty($tax)) {
-    $xml .= "<v1:VATTax>" . money_format('%.2n', $tax) . "</v1:VATTax>";
+    $xml .= "<v1:Tax>" . money_format('%.2n', $tax) . "</v1:Tax>";
   }
   if (!empty($shipping)) {
     $xml .= "<v1:Shipping>" . money_format('%.2n', $shipping) . "</v1:Shipping>";
